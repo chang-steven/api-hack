@@ -60,7 +60,12 @@ function getWeatherData(searchTerm,callback){
 
 function postWeatherResults(results) {
   console.log(results);
-  locationsArray.push(`{name: ${results.current_observation.display_location.city}, lat: ${results.current_observation.display_location.latitude}, lng: ${results.current_observation.display_location.longitude}`)
+  let location = {};
+  location.name = results.current_observation.display_location.city;
+  location.lat = results.current_observation.display_location.latitude;
+  location.lng = results.current_observation.display_location.longitude;
+  locationsArray.push(location);
+  console.log(locationsArray);
   $('#js-weather-forecast').empty();
   for (let i = 0; i < 5; i+=2 ){
     let dayForecast = results.forecast.txt_forecast.forecastday[i];
@@ -89,7 +94,7 @@ function getFourSquareFunData(searchTerm, callback){
     error: config.error
       };
   fourSquareObject.success = callback;
-  console.log(fourSquareObject);
+  // console.log(fourSquareObject);
   $.ajax(fourSquareObject);
 }
 
@@ -100,7 +105,7 @@ function postFourSquareFunResults(results) {
     $('#js-fun-results').empty();
     for (let i = 0; i < 5; i++){
     const fourSquare = results.response.groups[0].items[i];
-    locationsArray.push(`{name: ${fourSquare.venue.name}, lat: ${fourSquare.venue.location.labeledLatLngs["0"].lat}, lng: ${fourSquare.venue.location.labeledLatLngs["0"].lng}}`);
+    // locationsArray.push(`{name:${fourSquare.venue.name}, lat: ${fourSquare.venue.location.labeledLatLngs["0"].lat}, lng: ${fourSquare.venue.location.labeledLatLngs["0"].lng}}`);
     $('#js-fun-results').append(`<div class="window fun">
       <h3><a href=${fourSquare.tips["0"].canonicalUrl}>${fourSquare.venue.name}</a></h3>
       <div class="img-blurb"><div class="image"><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
@@ -109,7 +114,8 @@ function postFourSquareFunResults(results) {
       }
     }
   else console.error('oops');
-  console.log(locationsArray);
+  mapLocations();
+
 }
 
 function getFourSquareFoodData(searchTerm, callback){
@@ -129,17 +135,17 @@ function getFourSquareFoodData(searchTerm, callback){
     error: config.error
     };
   fourSquareObject.success = callback;
-  console.log(fourSquareObject);
+  // console.log(fourSquareObject);
   $.ajax(fourSquareObject);
 }
 
 function postFourSquareFoodResults(results) {
-  console.log(results);
+  // console.log(results);
   if (results){
     $('#js-food-results').empty();
     for (let i = 0; i < 5; i++){
     const fourSquare = results.response.groups[0].items[i];
-    locationsArray.push(`{name: ${fourSquare.venue.name}, lat: ${fourSquare.venue.location.labeledLatLngs["0"].lat}, lng: ${fourSquare.venue.location.labeledLatLngs["0"].lng}}`);
+    // locationsArray.push(`'[${fourSquare.venue.name}', ${fourSquare.venue.location.labeledLatLngs["0"].lat}, ${fourSquare.venue.location.labeledLatLngs["0"].lng}]`);
     $('#js-food-results').append(`<div class="window food">
       <h3><a href=${fourSquare.tips["0"].canonicalUrl}>${fourSquare.venue.name}</a></h3>
       <div class="img-blurb"><div class="image"><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
@@ -150,8 +156,35 @@ function postFourSquareFoodResults(results) {
   else console.error('oops');
 }
 
-function mapLocations(array){
+function mapLocations(){
+  let locations = [
+      ['Bondi Beach', -33.890542, 151.274856, 4],
+      ['Coogee Beach', -33.923036, 151.259052, 5],
+      ['Cronulla Beach', -34.028249, 151.157507, 3],
+      ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
+      ['Maroubra Beach', -33.950198, 151.259302, 1]
+    ];
+  let userCenter = {lat: -33.92, lng: 151.25};
 
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 10,
+    center: new google.maps.LatLng(userCenter),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+  const infowindow = new google.maps.InfoWindow();
+  let marker, i;
+  for (i = 1; i < locations.length; i++ ){
+    marker = new google.maps.Marker ({
+      position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+      map: map
+  });
+    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+      return function() {
+        infowindow.setContent(locations[i][0]);
+        infowindow.open(map, marker);
+      }
+    })(marker, i));
+  }
 }
 
 function weekender() {
