@@ -13,7 +13,9 @@ const config = {
   dataType: 'json',
   type: 'GET',
   error: console.log('error')
-}
+};
+const locationsArray = [];
+
 
 function listenForClick(){
   console.log('listenForClick initiated');
@@ -37,6 +39,19 @@ function getCurrentLocation() {
   }
 }
 
+function initMap() {
+  const santaBarbara = {lat: 34.41999817, lng: -119.70999908};
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 10,
+    center: santaBarbara
+    // mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+  const marker = new google.maps.Marker ({
+    position: santaBarbara,
+    map: map
+  });
+}
+
 function getWeatherData(searchTerm,callback){
   const city = searchTerm.city
   const localURL = `http://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${city}.json`;
@@ -45,6 +60,7 @@ function getWeatherData(searchTerm,callback){
 
 function postWeatherResults(results) {
   console.log(results);
+  locationsArray.push(`{name: ${results.current_observation.display_location.city}, lat: ${results.current_observation.display_location.latitude}, lng: ${results.current_observation.display_location.longitude}`)
   $('#js-weather-forecast').empty();
   for (let i = 0; i < 5; i+=2 ){
     let dayForecast = results.forecast.txt_forecast.forecastday[i];
@@ -84,14 +100,16 @@ function postFourSquareFunResults(results) {
     $('#js-fun-results').empty();
     for (let i = 0; i < 5; i++){
     const fourSquare = results.response.groups[0].items[i];
-    $('#js-fun-results').append(`<div class="window">
+    locationsArray.push(`{name: ${fourSquare.venue.name}, lat: ${fourSquare.venue.location.labeledLatLngs["0"].lat}, lng: ${fourSquare.venue.location.labeledLatLngs["0"].lng}}`);
+    $('#js-fun-results').append(`<div class="window fun">
       <h3><a href=${fourSquare.tips["0"].canonicalUrl}>${fourSquare.venue.name}</a></h3>
-      <img  src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}">
-      <div>${fourSquare.tips["0"].text}</div>
+      <div class="img-blurb"><div class="image"><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
+      <div class="blurb">${fourSquare.tips["0"].text}</div></div>
       </div>`)
       }
     }
   else console.error('oops');
+  console.log(locationsArray);
 }
 
 function getFourSquareFoodData(searchTerm, callback){
@@ -121,14 +139,19 @@ function postFourSquareFoodResults(results) {
     $('#js-food-results').empty();
     for (let i = 0; i < 5; i++){
     const fourSquare = results.response.groups[0].items[i];
-    $('#js-food-results').append(`<div class="window">
+    locationsArray.push(`{name: ${fourSquare.venue.name}, lat: ${fourSquare.venue.location.labeledLatLngs["0"].lat}, lng: ${fourSquare.venue.location.labeledLatLngs["0"].lng}}`);
+    $('#js-food-results').append(`<div class="window food">
       <h3><a href=${fourSquare.tips["0"].canonicalUrl}>${fourSquare.venue.name}</a></h3>
-      <img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}">
-      <div>${fourSquare.tips["0"].text}</div>
+      <div class="img-blurb"><div class="image"><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
+      <div class="blurb">${fourSquare.tips["0"].text}</div></div>
       </div>`)
       }
     }
   else console.error('oops');
+}
+
+function mapLocations(array){
+
 }
 
 function weekender() {

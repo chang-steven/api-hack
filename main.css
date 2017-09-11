@@ -1,6 +1,5 @@
 * {
   box-sizing: border-box;
-
 }
 
 body {
@@ -9,7 +8,29 @@ body {
   font-family: 'Roboto'; sans-serif;
 }
 
+#map {
+  height: 300px;
+  width: 500px;
+}
+
 .weather-forecast {
   width: 200px;
   display: inline-block;
+  vertical-align: top;
+  margin-left: 10px;
 }
+
+.img-blurb {
+  height: 150px;
+  width: 500px;
+}
+
+  .image {
+    display: inline-block;
+  }
+
+  .blurb {
+    vertical-align: top;
+    display: inline-block;
+    width: 150px;
+  }
