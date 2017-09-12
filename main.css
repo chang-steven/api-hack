@@ -3,30 +3,55 @@
 }
 
 body {
-  /*margin: 0 auto;*/
   padding: 0;
-  font-family: 'Roboto'; sans-serif;
+  /*margin: auto;*/
+  font-family: 'Roboto', sans-serif;
+}
+
+#left-pane, #js-fun-results, #js-food-results {
+  max-width: 33.33%;
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: top;
 }
 
 #map {
   height: 300px;
-  width: 500px;
+  width: 100%;
+  vertical-align: top;
 }
 
 .weather-forecast {
-  width: 200px;
+  max-width: 33.33%;
   display: inline-block;
   vertical-align: top;
-  margin-left: 10px;
+  padding-left: 4px;
+  font-size: .8em;
 }
+  .weather-forecast h3 {
+    text-align: center;
+    padding-left: 8px;
+  }
+
+  .weather-forecast img {
+    text-align: center;
+    display: block;
+    margin: auto;
+  }
+
+  .weather-blurb {
+    width: 75%;
+    margin: auto;
+  }
 
 .img-blurb {
   height: 150px;
-  width: 500px;
+  /*width: 500px;*/
 }
 
   .image {
     display: inline-block;
+    border: 1px black solid;
   }
 
   .blurb {
