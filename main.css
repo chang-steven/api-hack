@@ -13,9 +13,12 @@ body {
   display: inline-block;
   margin-left: 10px;
   vertical-align: top;
+  overflow-y: scroll;
+  max-height: 900px;
 }
 
 #map {
+  display: inline-block;
   height: 300px;
   width: 100%;
   vertical-align: top;
@@ -46,6 +49,7 @@ body {
 
 .img-blurb {
   height: 150px;
+  max-width: 315px;
   /*width: 500px;*/
 }
 
