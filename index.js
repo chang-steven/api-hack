@@ -12,7 +12,7 @@ const config = {
   url: fourSquareURL,
   dataType: 'json',
   type: 'GET',
-  error: console.log('error')
+  error: function(){console.log('error');}
 };
 let funLocationsArray = [];
 let foodLocationsArray = [];
@@ -128,6 +128,8 @@ function getFourSquareFunData(searchTerm, callback){
   $.ajax(fourSquareObject);
 }
 
+// <span class="rating">${fourSquare.venue.rating}</span>
+
 function postFourSquareFunResults(results) {
   console.log(results);
   if (results){
@@ -135,7 +137,7 @@ function postFourSquareFunResults(results) {
     funLocationsArray = [];
     $('#js-fun-results').append(`<h2>What to Do</h2>`);
     for (let i = 0; i < 5; i++){
-    const fourSquare = results.response.groups[0].items[i];
+    const fourSquare = results.response.groups["0"].items[i];
     let location = [fourSquare.venue.name,
       Number(fourSquare.venue.location.labeledLatLngs["0"].lat),
       Number(fourSquare.venue.location.labeledLatLngs["0"].lng),
@@ -144,7 +146,7 @@ function postFourSquareFunResults(results) {
     funLocationsArray.push(location);
     $('#js-fun-results').append(`<div class="window fun">
       <h3><a href=${fourSquare.tips["0"].canonicalUrl}>${fourSquare.venue.name}</a></h3>
-      <div class="img-blurb"><div class="image"><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
+      <div class="img-blurb"><div class="image"><span class="rating">${fourSquare.venue.rating}</span><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
       <div class="blurb">${fourSquare.tips["0"].text}</div></div>
       </div>`)
     };
@@ -173,6 +175,8 @@ function getFourSquareFoodData(searchTerm, callback){
   $.ajax(fourSquareObject);
 }
 
+
+
 function postFourSquareFoodResults(results) {
   // console.log(results);
   if (results){
@@ -180,8 +184,7 @@ function postFourSquareFoodResults(results) {
     foodLocationsArray = [];
     $('#js-food-results').append(`<h2>What to Eat</h2>`);
     for (let i = 0; i < 5; i++){
-      console.log(i);
-      const fourSquare = results.response.groups[0].items[i];
+      const fourSquare = results.response.groups["0"].items[i];
       let location = [fourSquare.venue.name,
         Number(fourSquare.venue.location.labeledLatLngs["0"].lat),
         Number(fourSquare.venue.location.labeledLatLngs["0"].lng),
@@ -190,7 +193,8 @@ function postFourSquareFoodResults(results) {
       foodLocationsArray.push(location);
       $('#js-food-results').append(`<div class="window food">
         <h3><a href=${fourSquare.tips["0"].canonicalUrl}>${fourSquare.venue.name}</a></h3>
-        <div class="img-blurb"><div class="image"><img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
+        <div class="img-blurb"><div class="image"><span class="rating">${fourSquare.venue.rating}</span>
+<img src="${fourSquare.venue.photos.groups["0"].items["0"].prefix}150x150${fourSquare.venue.photos.groups["0"].items["0"].suffix}"></div>
         <div class="blurb">${fourSquare.tips["0"].text}</div></div>
         </div>`)
       };
@@ -222,6 +226,8 @@ function mapLocations(){
 }
 
 function weekender() {
+
+
   listenForClick();
   getCurrentLocation();
   getWeatherData(defaultLocation, postWeatherResults);

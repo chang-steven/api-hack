@@ -9,9 +9,9 @@ body {
 }
 
 #left-pane, #js-fun-results, #js-food-results {
-  max-width: 33.33%;
-  display: inline-block;
-  margin-left: 10px;
+  /*max-width: 33.33%;*/
+  /*display: inline-block;*/
+  padding-left: 10px;
   vertical-align: top;
   overflow-y: scroll;
   max-height: 900px;
@@ -34,6 +34,7 @@ body {
   .weather-forecast h3 {
     text-align: center;
     padding-left: 8px;
+    width: 85%;
   }
 
   .weather-forecast img {
@@ -48,18 +49,38 @@ body {
   }
 
 .img-blurb {
-  height: 150px;
-  max-width: 315px;
-  /*width: 500px;*/
+  display: inline-block;
 }
 
   .image {
     display: inline-block;
     border: 1px black solid;
+    position: relative  ;
   }
+    .image img {
+      width: 100%;
+    }
 
   .blurb {
     vertical-align: top;
     display: inline-block;
-    width: 150px;
+    width: 125px;
+    font-size: 0.85em;
+    overflow-y: scroll;
   }
+
+  .image span {
+    font-size: 0.8em;
+    margin-left: 0.4em;
+    border-radius: 50%;
+    padding: 0.4em;
+    border: 1px solid black;
+    background-color: #f4ce42;
+    position: absolute;
+    right: -5px;
+    top: -5px;
+  }
+
+.window {
+  margin: auto;
+}
