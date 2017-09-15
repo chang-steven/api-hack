@@ -45,9 +45,6 @@
 
 /* Non-mobile, grid */
 @media screen and (min-width: 640px) and (max-width: 800px){
-  /*#left-pane {
-    width: 100%;
-  }*/
 
   .window {
     text-align: left;

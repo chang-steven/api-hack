@@ -2,6 +2,12 @@
   box-sizing: border-box;
 }
 
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
 #background {
   position: fixed;
   width: 100%;
@@ -15,15 +21,19 @@
   z-index: -1;
 }
 
-body {
-  padding: 0;
-  margin: 0;
-  font-family: 'Ubuntu', sans-serif;
+main, header {
+  z-index: 2;
 }
 
-main, header {
-  z-index: 1;
+h1 {
+  display: inline-block;
 }
+
+  #loading {
+    margin-left: 10px;
+    display: inline-block;
+    font-size: 50px:
+  }
 
 .text-input h3, input{
   display: inline-block;
@@ -65,35 +75,15 @@ button:hover {
   vertical-align: top;
 }
 
-#span-holder {
-  display: inline-block;
-  position:relative;
-}
-
-#loading {
-  position: absolute;
-  /*bottom: 10px;;*/
-}
-
-#loading p {
-  display: inline-block;
-  font-size: 30px:
-  /*font-weight: bold;*/
-
-}
-
 #map {
   display: inline-block;
   height: 300px;
   width: 100%;
   vertical-align: top;
-
-}
-#map {
-    border: 1px black solid;
-    -webkit-border-radius: 5%;
-   -moz-border-radius: 5%;
-   border-radius: 5%;
+  border: 1px black solid;
+  -webkit-border-radius: 5%;
+  -moz-border-radius: 5%;
+  border-radius: 5%;
 }
 
 #js-weather-forecast h2 {
