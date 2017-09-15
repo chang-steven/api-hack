@@ -2,19 +2,84 @@
   box-sizing: border-box;
 }
 
+#background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: url('beach-background.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  opacity: 0.4;
+  z-index: -1;
+}
+
 body {
   padding: 0;
-  /*margin: auto;*/
-  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+main, header {
+  z-index: 1;
+}
+
+.text-input h3, input{
+  display: inline-block;
+  font-size: 14px;
+}
+
+.text-input input {
+  border: 1px gray solid;
+  border-radius: 10%;
+  font-size: 12px;
+  padding: 4px;
+}
+
+button {
+    background-color: rgb(240, 240, 245);
+    border: none;
+    border-radius: 5%;
+    color: white;
+    padding: 4px 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s
+    transition-duration: 0.4s;
+    cursor: pointer;
+    color: black;
+    border: 2px solid #4CAF50;
+  }
+
+button:hover {
+  background-color: #4CAF50;
+  color: white;
 }
 
 #left-pane, #js-fun-results, #js-food-results {
-  /*max-width: 33.33%;*/
-  /*display: inline-block;*/
-  padding-left: 10px;
+  padding-left: 15px;
   vertical-align: top;
-  overflow-y: scroll;
-  max-height: 900px;
+}
+
+#span-holder {
+  display: inline-block;
+  position:relative;
+}
+
+#loading {
+  position: absolute;
+  /*bottom: 10px;;*/
+}
+
+#loading p {
+  display: inline-block;
+  font-size: 30px:
+  /*font-weight: bold;*/
+
 }
 
 #map {
@@ -22,8 +87,18 @@ body {
   height: 300px;
   width: 100%;
   vertical-align: top;
+
+}
+#map {
+    border: 1px black solid;
+    -webkit-border-radius: 5%;
+   -moz-border-radius: 5%;
+   border-radius: 5%;
 }
 
+#js-weather-forecast h2 {
+  padding-left: 0.6em;
+}
 .weather-forecast {
   max-width: 33.33%;
   display: inline-block;
@@ -32,7 +107,7 @@ body {
   font-size: .8em;
 }
   .weather-forecast h3 {
-    text-align: center;
+    /*text-align: center;*/
     padding-left: 8px;
     width: 85%;
   }
@@ -45,20 +120,22 @@ body {
 
   .weather-blurb {
     width: 75%;
-    margin: auto;
+    /*margin: auto;*/
   }
 
 .img-blurb {
   display: inline-block;
 }
 
+
   .image {
     display: inline-block;
-    border: 1px black solid;
     position: relative  ;
   }
     .image img {
       width: 100%;
+      border: 1px black solid;
+      border-radius: 10%;
     }
 
   .blurb {
@@ -77,10 +154,6 @@ body {
     border: 1px solid black;
     background-color: #f4ce42;
     position: absolute;
-    right: -5px;
+    right: -2px;
     top: -5px;
   }
-
-.window {
-  margin: auto;
-}
