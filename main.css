@@ -2,12 +2,6 @@
   box-sizing: border-box;
 }
 
-body {
-  padding: 0;
-  margin: 0;
-  font-family: 'Ubuntu', sans-serif;
-}
-
 #background {
   position: fixed;
   width: 100%;
@@ -21,6 +15,12 @@ body {
   z-index: -1;
 }
 
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
 main, header {
   z-index: 2;
 }
@@ -28,12 +28,6 @@ main, header {
 h1 {
   display: inline-block;
 }
-
-  #loading {
-    margin-left: 10px;
-    display: inline-block;
-    font-size: 50px:
-  }
 
 .text-input h3, input{
   display: inline-block;
@@ -75,6 +69,12 @@ button:hover {
   vertical-align: top;
 }
 
+#loading {
+  margin-left: 10px;
+  display: inline-block;
+  font-size: 50px:
+}
+
 #map {
   display: inline-block;
   height: 300px;
@@ -110,6 +110,7 @@ button:hover {
 
   .weather-blurb {
     width: 75%;
+    display: inline-block;
     /*margin: auto;*/
   }
 

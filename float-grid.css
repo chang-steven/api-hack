@@ -75,9 +75,13 @@
     display: inline-block;
   }
 
+  #left-pane {
+    width: 50%;
+  }
+
   /* 4 columns, 4/12 in % */
   .col-4 {
-    width: 33.333333%;
+    width: 25%;
     overflow-y: scroll;
     max-height: 700px;
   }
