@@ -100,7 +100,9 @@ function callAPIs(searchTerm){
           Number(item.venue.location.labeledLatLngs[0].lat),
           Number(item.venue.location.labeledLatLngs[0].lng),
           index + 1,
-          item.tips[0].canonicalUrl
+          item.tips[0].canonicalUrl,
+          item.venue.photos.groups[0].items[0].prefix,
+          item.venue.photos.groups[0].items[0].suffix
         ];
       });
       const foodLocations = responses[2].response.groups[0].items.splice(0, 10).map(function(item, index) {
@@ -109,14 +111,22 @@ function callAPIs(searchTerm){
           Number(item.venue.location.labeledLatLngs[0].lat),
           Number(item.venue.location.labeledLatLngs[0].lng),
           index + 1,
-          item.tips[0].canonicalUrl
+          item.tips[0].canonicalUrl,
+          item.venue.photos.groups[0].items[0].prefix,
+          item.venue.photos.groups[0].items[0].suffix
         ];
       });
-      console.log(funLocations, foodLocations);
-      // funLocations.splice(10);
-      // foodLocations.splice(10);
-      const readyMap = funLocations.concat(foodLocations);
-      mapLocations(readyMap, destinationInput);
+      let locationDataByType = {
+        fun: {
+          objects: funLocations,
+          iconURL: 'http://maps.google.com/mapfiles/ms/micons/POI.png'
+        },
+        food: {
+          objects: foodLocations,
+          iconURL: 'http://maps.google.com/mapfiles/ms/micons/restaurant.png'
+        }
+      };
+      mapLocations(locationDataByType, destinationInput);
     });
   }
 
@@ -180,41 +190,42 @@ function postFourSquareFoodResults(results) {
   };
 }
 
-function mapLocations(mapArray, mapCenter){
+function mapLocations(locationDataByType, mapCenter){
   const map = new google.maps.Map(document.getElementById('map'), {
     zoom: 12,
     center: new google.maps.LatLng(mapCenter),
     mapTypeId: google.maps.MapTypeId.ROADMAP
   });
   const infowindow = new google.maps.InfoWindow();
-  let marker, i;
-  for (i = 0; i < 20; i++) {
+
+
+  function addMarkerToMap(location, iconURL) {
     marker = new google.maps.Marker ({
-      position: new google.maps.LatLng(mapArray[i][1], mapArray[i][2]),
-      icon: 'http://maps.google.com/mapfiles/ms/micons/POI.png',
+      position: new google.maps.LatLng(location[1], location[2]),
+      icon: iconURL,
       map: map
-  });
-  // for (i = 10; i < 20; i++) {
-  //   marker = new google.maps.Marker ({
-  //     position: new google.maps.LatLng(mapArray[i][1], mapArray[i][2]),
-  //     icon: 'http://maps.google.com/mapfiles/ms/micons/restaurant.png',
-  //     map: map
-  // });
-    google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
-      return function() {
-        infowindow.setContent(`<div class="info-window">
-        <a href="${mapArray[i][4]}">${mapArray[i][3]}. ${mapArray[i][0]}</a></div>`);
+    });
+    google.maps.event.addListener(marker, 'mouseover', function() {
+        infowindow.setContent(`<div class="info-window"><img src="${location[5]}50x50${location[6]}" alt="${location[0]}">
+        <a href="${location[4]}">${location[3]}. ${location[0]}</a></div>`);
         infowindow.open(map, marker);
       }
-    })(marker, i));
-  };
+    );
+  }
+  Object.keys(locationDataByType).forEach(function(locationType) {
+    let locations = locationDataByType[locationType].objects;
+    let locationIconURL = locationDataByType[locationType].iconURL;
+    locations.forEach(function(location) {
+      addMarkerToMap(location, locationIconURL);
+    });
+  })
 }
 
-function weekender() {
+function planIt() {
   listenForClick();
   getCurrentLocation();
   callAPIs(defaultLocation);
 }
 
 //On page load, call the function 'weekender'
-$(weekender);
+$(planIt);
