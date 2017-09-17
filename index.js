@@ -45,6 +45,11 @@ function getCurrentLocation() {
   }
 }
 
+function errorHandling(reason){
+  alert(reason);
+  console.log(reason);
+}
+
 function callAPIs(searchTerm){
   // $('#js-fun-results').append(`<h1>Loading...</h1>`);
   const localURL = `http://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${searchTerm.city}.json`;
@@ -127,7 +132,7 @@ function callAPIs(searchTerm){
         }
       };
       mapLocations(locationDataByType, destinationInput);
-    });
+    }).catch(errorHandling(reason));
   }
 
 // function getTravelTime(searchTerm, callback){
@@ -198,19 +203,19 @@ function mapLocations(locationDataByType, mapCenter){
   });
   const infowindow = new google.maps.InfoWindow();
 
-
   function addMarkerToMap(location, iconURL) {
     marker = new google.maps.Marker ({
       position: new google.maps.LatLng(location[1], location[2]),
       icon: iconURL,
       map: map
     });
-    google.maps.event.addListener(marker, 'mouseover', function() {
+    google.maps.event.addListener(marker, 'mouseover', (function(marker, location) {
+      return function(){
         infowindow.setContent(`<div class="info-window"><img src="${location[5]}50x50${location[6]}" alt="${location[0]}">
         <a href="${location[4]}">${location[3]}. ${location[0]}</a></div>`);
         infowindow.open(map, marker);
       }
-    );
+    })(marker, location));
   }
   Object.keys(locationDataByType).forEach(function(locationType) {
     let locations = locationDataByType[locationType].objects;
