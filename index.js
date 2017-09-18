@@ -1,22 +1,15 @@
 //Define global variables
-const fourSquareURL = 'https://api.foursquare.com/v2/venues/explore';
-const openWeatherMapURL = 'https://api.openweathermap.org/data/2.5/weather';
-const wundergroundURL = 'http://api.wunderground.com/api/5c23472908e94808/forecast';
 const config = {
   client_id: 'GDAZIM0JN05C0I31Y4X0OCSFGFXRY44FWSAXM42HTU4ZYEZL',
   client_secret: 'QESW05VJ2KP2LQZOTM0MNVKE2QC3DCYEU5UY5DNE5YBB0NRV',
   v: '20170101',
   venuePhotos: 1,
-  url: fourSquareURL,
+  url: 'https://api.foursquare.com/v2/venues/explore',
   dataType: 'json',
   type: 'GET',
   error: function() {
     console.log('error');
   }
-};
-const defaultLocation = {
-  city: 'Santa Barbara',
-  state: 'CA'
 };
 const currentLocation = {};
 
@@ -24,7 +17,7 @@ const currentLocation = {};
 function listenForClick() {
   $('#destination-form').on('submit', ( event => {
     event.preventDefault();
-    $('#loading').append(`<p>Loading...</p>`);
+    $('#loading').append('<p>Loading...</p>');
     const query = {
       city: $('#js-destination-city').val(),
       state: $('#js-destination-state').val(),
@@ -50,91 +43,6 @@ function errorHandling(reason){
   console.log(reason);
 }
 
-function callAPIs(searchTerm){
-  // $('#js-fun-results').append(`<h1>Loading...</h1>`);
-  const localURL = `http://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${searchTerm.city}.json`;
-  const weatherObject = {
-    url: localURL,
-    dataType: 'json',
-    type: 'GET',
-    error: config.error
-      };
-  const callWeather = $.ajax(weatherObject);
-
-  const fourSquareFunObject = {
-    data: {
-      client_id: config.client_id,
-      client_secret: config.client_secret,
-      v: config.v,
-      venuePhotos: config.venuePhotos,
-      near: `${searchTerm.city}, ${searchTerm.state}`,
-      query: 'fun'
-      },
-    url: config.url,
-    dataType: config.dataType,
-    type: config.type,
-    error: config.error
-      };
-    const callFourSquareFun = $.ajax(fourSquareFunObject);
-
-    const fourSquareFoodObject = {
-      data: {
-        client_id: config.client_id,
-        client_secret: config.client_secret,
-        v: config.v,
-        venuePhotos: config.venuePhotos,
-        near: `${searchTerm.city}, ${searchTerm.state}`,
-        section: 'food',
-        },
-      url: config.url,
-      dataType: config.dataType,
-      type: config.type,
-      error: config.error
-        };
-    const callFourSquareFood = $.ajax(fourSquareFoodObject);
-
-    Promise.all([callWeather, callFourSquareFun, callFourSquareFood]).then((responses) => {
-      $('#loading').empty();
-      postWeatherResults(responses[0]);
-      postFourSquareFunResults(responses[1]);
-      postFourSquareFoodResults(responses[2]);
-      const destinationInput = responses[1].response.geocode.center;
-      const funLocations = responses[1].response.groups[0].items.splice(0, 10).map(function(item, index) {
-        return [
-          item.venue.name,
-          Number(item.venue.location.labeledLatLngs[0].lat),
-          Number(item.venue.location.labeledLatLngs[0].lng),
-          index + 1,
-          item.tips[0].canonicalUrl,
-          item.venue.photos.groups[0].items[0].prefix,
-          item.venue.photos.groups[0].items[0].suffix
-        ];
-      });
-      const foodLocations = responses[2].response.groups[0].items.splice(0, 10).map(function(item, index) {
-        return [
-          item.venue.name,
-          Number(item.venue.location.labeledLatLngs[0].lat),
-          Number(item.venue.location.labeledLatLngs[0].lng),
-          index + 1,
-          item.tips[0].canonicalUrl,
-          item.venue.photos.groups[0].items[0].prefix,
-          item.venue.photos.groups[0].items[0].suffix
-        ];
-      });
-      let locationDataByType = {
-        fun: {
-          objects: funLocations,
-          iconURL: 'http://maps.google.com/mapfiles/ms/micons/POI.png'
-        },
-        food: {
-          objects: foodLocations,
-          iconURL: 'http://maps.google.com/mapfiles/ms/micons/restaurant.png'
-        }
-      };
-      mapLocations(locationDataByType, destinationInput);
-    }).catch(errorHandling(reason));
-  }
-
 // function getTravelTime(searchTerm, callback){
 //   let city = searchTerm.city;
 //   let state = searchTerm.state;
@@ -157,8 +65,7 @@ function postDirectionResults(results){
 }
 
 function postWeatherResults(results) {
-  $('#js-weather-forecast').empty();
-  $('#js-weather-forecast').append(`<h2>3-Day Forecast</h2>`);
+  $('#js-weather-forecast').empty().append(`<h2>3-Day Forecast</h2>`);
   for (let i = 0; i < 5; i+=2 ){
     let dayForecast = results.forecast.txt_forecast.forecastday[i];
     $('#js-weather-forecast').append(`<div class="window weather-forecast">
@@ -170,8 +77,7 @@ function postWeatherResults(results) {
 }
 
 function postFourSquareFunResults(results) {
-  $('#js-fun-results').empty();
-  $('#js-fun-results').append(`<h2>What to Do</h2>`);
+  $('#js-fun-results').empty().append(`<h2>What to Do</h2>`);
   for (let i = 0; i <10; i++){
   const fourSquare = results.response.groups[0].items[i];
   $('#js-fun-results').append(`<div class="window fun">
@@ -183,7 +89,6 @@ function postFourSquareFunResults(results) {
 
 function postFourSquareFoodResults(results) {
   $('#js-food-results').empty();
-  foodLocationsArray = [];
   $('#js-food-results').append(`<h2>What to Eat</h2>`);
   for (let i = 0; i < 10; i++){
     const fourSquare = results.response.groups[0].items[i];
@@ -196,7 +101,7 @@ function postFourSquareFoodResults(results) {
 }
 
 function mapLocations(locationDataByType, mapCenter){
-  const map = new google.maps.Map(document.getElementById('map'), {
+  const map = new google.maps.Map( $('#map')[0], {
     zoom: 12,
     center: new google.maps.LatLng(mapCenter),
     mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -211,7 +116,7 @@ function mapLocations(locationDataByType, mapCenter){
     });
     google.maps.event.addListener(marker, 'mouseover', (function(marker, location) {
       return function(){
-        infowindow.setContent(`<div class="info-window"><img src="${location[5]}50x50${location[6]}" alt="${location[0]}">
+        infowindow.setContent(`<div class="info-window"><img src="${location[5]}" alt="${location[0]}">
         <a href="${location[4]}">${location[3]}. ${location[0]}</a></div>`);
         infowindow.open(map, marker);
       }
@@ -226,9 +131,93 @@ function mapLocations(locationDataByType, mapCenter){
   })
 }
 
+function callAPIs(searchTerm){
+  const localURL = `http://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${searchTerm.city}.json`;
+  const weatherObject = {
+    url: localURL,
+    dataType: 'json',
+    type: 'GET',
+    error: config.error
+  };
+  const callWeather = $.ajax(weatherObject);
+  const fourSquareFunObject = {
+    data: {
+      client_id: config.client_id,
+      client_secret: config.client_secret,
+      v: config.v,
+      venuePhotos: config.venuePhotos,
+      near: `${searchTerm.city}, ${searchTerm.state}`,
+      query: 'fun'
+    },
+    url: config.url,
+    dataType: config.dataType,
+    type: config.type,
+    error: config.error
+  };
+  const callFourSquareFun = $.ajax(fourSquareFunObject);
+  const fourSquareFoodObject = {
+    data: {
+      client_id: config.client_id,
+      client_secret: config.client_secret,
+      v: config.v,
+      venuePhotos: config.venuePhotos,
+      near: `${searchTerm.city}, ${searchTerm.state}`,
+      section: 'food',
+    },
+    url: config.url,
+    dataType: config.dataType,
+    type: config.type,
+    error: config.error
+  };
+  const callFourSquareFood = $.ajax(fourSquareFoodObject);
+
+  Promise.all([callWeather, callFourSquareFun, callFourSquareFood]).then((responses) => {
+    $('#loading').empty();
+    postWeatherResults(responses[0]);
+    postFourSquareFunResults(responses[1]);
+    postFourSquareFoodResults(responses[2]);
+    const destinationInput = responses[1].response.geocode.center;
+    const funLocations = responses[1].response.groups[0].items.splice(0, 10).map(function(item, index) {
+      return [
+        item.venue.name,
+        Number(item.venue.location.labeledLatLngs[0].lat),
+        Number(item.venue.location.labeledLatLngs[0].lng),
+        index + 1,
+        item.tips[0].canonicalUrl,
+        item.venue.photos.groups[0].items[0].prefix + '50x50' + item.venue.photos.groups[0].items[0].suffix
+      ];
+    });
+    const foodLocations = responses[2].response.groups[0].items.splice(0, 10).map(function(item, index) {
+      return [
+        item.venue.name,
+        Number(item.venue.location.labeledLatLngs[0].lat),
+        Number(item.venue.location.labeledLatLngs[0].lng),
+        index + 1,
+        item.tips[0].canonicalUrl,
+        item.venue.photos.groups[0].items[0].prefix + '50x50'+ item.venue.photos.groups[0].items[0].suffix
+      ];
+    });
+    let locationDataByType = {
+      fun: {
+        objects: funLocations,
+        iconURL: 'http://maps.google.com/mapfiles/ms/micons/POI.png'
+      },
+      food: {
+        objects: foodLocations,
+        iconURL: 'http://maps.google.com/mapfiles/ms/micons/restaurant.png'
+      }
+    };
+    mapLocations(locationDataByType, destinationInput);
+  }).catch(errorHandling(reason));
+}
+
 function planIt() {
   listenForClick();
   getCurrentLocation();
+  const defaultLocation = {
+    city: 'Santa Barbara',
+    state: 'CA'
+  };
   callAPIs(defaultLocation);
 }
 

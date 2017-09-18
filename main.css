@@ -40,9 +40,16 @@ h1 {
   top: 14px;
 }
 
-#four-square, #wunderground {
+#four-square {
   width: 200px;
   display: inline-block;
+  margin-top: 10px;
+}
+
+#wunderground {
+  width: 175px;
+  display: inline-block;
+  margin-top: 10px;
 }
 
 #four-square img, #wunderground img {
