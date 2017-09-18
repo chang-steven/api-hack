@@ -22,7 +22,41 @@ function listenForClick() {
       state: $('#js-destination-state').val(),
     }
     callAPIs(query);
-  }));
+    getTravelTime(query, postDirectionResults);
+    })
+  );
+}
+
+//This function geolocates the user and
+function getCurrentLocation() {
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition( function(position) {
+    currentLocation.lat = position.coords.latitude;
+    currentLocation.lng = position.coords.longitude;
+    console.log(currentLocation);
+    });
+  }
+}
+
+function getTravelTime(searchTerm, callback){
+  let city = searchTerm.city;
+  let state = searchTerm.state;
+  // let directionURL = `https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=&key=AIzaSyA6i1il1U7eP3j5nuBs5iAcvGiPKB4gVTY`;
+  let directionURL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Washington,DC&destinations=New+York+City,NY&key=AIzaSyA6i1il1U7eP3j5nuBs5iAcvGiPKB4gVTY';
+  let travelObject = {
+    url: directionURL,
+    type: 'GET',
+    dataType: 'json',
+    // cache: false,
+    // jsonpCallback: postDirectionResults,
+    success: postDirectionResults
+  };
+  $.ajax(travelObject);
+}
+
+function postDirectionResults(results){
+  console.log('postDirectionResults ran');
+  console.log(results);
 }
 
 //Receives data returned from weather API and post to DOM
