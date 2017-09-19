@@ -20,7 +20,7 @@
   clear: both;
 }
 
-.col-3, .col-4, .col-6, .col-12 {
+.col-4, .col-12 {
   float: left;
   padding-left: 1.04166666%;
   padding-right: 1.04166666%;
@@ -58,12 +58,11 @@
   .col-4 h2 {
     padding-left: 0;
   }
-  /* 4 columns, 4/12 in % */
+
   .col-4 {
     width: 50%;
   }
 
-  /* 12 columns, 12/12 in % */
   .col-12 {
     width: 100%;
   }
@@ -79,11 +78,9 @@
     width: 40%;
   }
 
-  /* 4 columns, 4/12 in % */
   .col-4 {
     width: 30%;
     overflow-y: scroll;
     max-height: 700px;
   }
-
 }

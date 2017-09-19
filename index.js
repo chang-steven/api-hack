@@ -25,18 +25,20 @@ function listenForClick() {
   }));
 }
 
+//Receives data returned from weather API and post to DOM
 function postWeatherResults(results) {
   $('#js-weather-forecast').empty().append(`<h2>3-Day Forecast</h2>`);
   for (let i = 0; i < 5; i+=2 ){
     let dayForecast = results.forecast.txt_forecast.forecastday[i];
     $('#js-weather-forecast').append(`<div class="window weather-forecast">
-      <h3>${dayForecast.title}</h3>
-      <img src="${dayForecast.icon_url}">
-      <div class="weather-blurb">${dayForecast.fcttext}</div>
-      </div>`);
+    <h3>${dayForecast.title}</h3>
+    <img src="${dayForecast.icon_url}">
+    <div class="weather-blurb">${dayForecast.fcttext}</div>
+    </div>`);
   };
 }
 
+//Receives data from Four Square API call for fun results and post to DOM
 function postFourSquareFunResults(result) {
   $('#js-fun-results').append(`<div id="fun-${result.rank}" class="window">
   <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
@@ -45,14 +47,16 @@ function postFourSquareFunResults(result) {
   </div>`);
 }
 
+//Receives data from Four Square API call for food results and post to DOM
 function postFourSquareFoodResults(result) {
-    $('#js-food-results').append(`<div id="food-${result.rank}" class="window">
-    <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
-    <img src="${result.imgUrl}" alt="${result.name}"></div>
-    <div class="blurb">${result.blurb}</div></div>
-    </div>`);
+  $('#js-food-results').append(`<div id="food-${result.rank}" class="window">
+  <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
+  <img src="${result.imgUrl}" alt="${result.name}"></div>
+  <div class="blurb">${result.blurb}</div></div>
+  </div>`);
 }
 
+//Takes coordinates of food and fun venues and adds markers and info-windows to Google map
 function mapLocations(locationDataByType, mapCenter){
   const map = new google.maps.Map( $('#map')[0], {
     zoom: 12,
@@ -84,34 +88,34 @@ function mapLocations(locationDataByType, mapCenter){
   })
 }
 
+//Function to validate and organize data to be passed into the posting functions
 function handleFourSquareData(data, index) {
   return { name: data.venue.name,
     rank: index + 1,
-    rating: data.venue.rating,
+    rating: (function() {
+      if (typeof data.venue.rating == 'undefined'){
+        return 'n/a'
+      }
+      else {
+        return data.venue.rating
+      }}
+    )(),
     blurb: (data.tips ? data.tips[0].text : 'Sorry, nothing to show.'),
-    fourSquarelink: (data.tips ? data.tips[0].canonicalUrl : 'does not exist'),
+    fourSquarelink: (data.tips ? data.tips[0].canonicalUrl : 'blank'),
     imgUrl:  (function() {
       if (data.venue.photos.groups.length && data.venue.photos.groups[0].items[0].hasOwnProperty('prefix')) {
         return data.venue.photos.groups[0].items[0].prefix + '150x150' + data.venue.photos.groups[0].items[0].suffix
       }
       else {
-        return '//:0'
+        return 'Assets/not-available.jpg'
       }
     })(),
-    // (function() {
-    //   if (data.venue.photos.groups && data.venue.photos.groups[0].items.length) {
-    //     return data.venue.photos.groups[0].items[0].prefix + '150x150' + data.venue.photos.groups[0].items[0].suffix
-    //   }
-    //   else {
-    //     return 'does not exist'
-    //   }
-    // })(),
     imgUrl2: (function() {
       if (data.venue.photos.groups.length && data.venue.photos.groups[0].items[0].hasOwnProperty('prefix')) {
         return data.venue.photos.groups[0].items[0].prefix + '50x50' + data.venue.photos.groups[0].items[0].suffix
       }
       else {
-        return '//:0'
+        return 'Assets/not-available.jpg'
       }
     })(),
     lat: (data.venue.location.labeledLatLngs ? data.venue.location.labeledLatLngs[0].lat : data.venue.location.lat),
@@ -119,6 +123,7 @@ function handleFourSquareData(data, index) {
   }
 }
 
+//Function that calls the APIs and passes in the users parameters for the GET requests
 function callAPIs(searchTerm){
   const localURL = `http://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${searchTerm.city}.json`;
   const weatherObject = {
@@ -159,18 +164,11 @@ function callAPIs(searchTerm){
   };
   const callFourSquareFood = $.ajax(fourSquareFoodObject);
 
-  Promise.all([callWeather, callFourSquareFun, callFourSquareFood]).catch(error => {
-    alert('Sorry, there was an error!  Please check the format and try again' );
-    $('#loading').text('Unable to Load.');
-    console.log(error);
-    throw error;
-  })
+  Promise.all([callWeather, callFourSquareFun, callFourSquareFood])
   .then((responses) => {
     $('#loading').empty();
     console.log(responses[1], responses[2])
     postWeatherResults(responses[0]);
-    // postFourSquareFunResults(responses[1]);
-    // postFourSquareFoodResults(responses[2]);
     const parsedFunResults = responses[1].response.groups[0].items.splice(0, 10).map(handleFourSquareData);
     const parsedFoodResults = responses[2].response.groups[0].items.splice(0, 10).map(handleFourSquareData);
     console.log(parsedFunResults, parsedFoodResults)
@@ -180,26 +178,6 @@ function callAPIs(searchTerm){
     parsedFoodResults.forEach(postFourSquareFoodResults);
 
     const destinationInput = responses[1].response.geocode.center;
-    // const funLocations = responses[1].response.groups[0].items.splice(0, 10).map(function(item, index) {
-    //   return [
-    //     item.venue.name,
-    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lat : item.venue.location.lat),
-    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lng : item.venue.location.lng),
-    //     index + 1,
-    //     item.tips[0].canonicalUrl,
-    //     item.venue.photos.groups[0].items[0].prefix + '50x50' + item.venue.photos.groups[0].items[0].suffix
-    //   ];
-    // });
-    // const foodLocations = responses[2].response.groups[0].items.splice(0, 10).map(function(item, index) {
-    //   return [
-    //     item.venue.name,
-    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lat : item.venue.location.lat),
-    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lng : item.venue.location.lng),
-    //     index + 1,
-    //     item.tips[0].canonicalUrl,
-    //     item.venue.photos.groups[0].items[0].prefix + '50x50'+ item.venue.photos.groups[0].items[0].suffix
-    //   ];
-    // });
     let locationDataByType = {
       fun: {
         objects: parsedFunResults,
@@ -211,10 +189,15 @@ function callAPIs(searchTerm){
       }
     };
     mapLocations(locationDataByType, destinationInput);
+  })
+  .catch(error => {
+    alert('Sorry, there was an error!  Please check the format and try again' );
+    $('#loading').text('Unable to Load.');
+    console.log(error);
   });
 }
 
-
+//Function that initiates submit listener and loads default location upon bage load
 function planIt() {
   listenForClick();
   const defaultLocation = {
@@ -224,5 +207,5 @@ function planIt() {
   callAPIs(defaultLocation);
 }
 
-//On page load, call the function 'weekender'
+//On page load, call the function 'planIt'
 $(planIt);
