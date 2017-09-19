@@ -35,6 +35,10 @@ h1 {
   position: static;
 }
 
+#logo {
+  display: inline-block;
+}
+
 #logo img {
   position: relative;
   top: 14px;

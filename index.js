@@ -11,57 +11,18 @@ const config = {
     console.log('error');
   }
 };
-const currentLocation = {};
 
 //Initiate event listeners and listen for click
 function listenForClick() {
   $('#destination-form').on('submit', ( event => {
     event.preventDefault();
-    $('#loading').append('<p>Loading...</p>');
+    $('#loading').text('Loading...');
     const query = {
       city: $('#js-destination-city').val(),
       state: $('#js-destination-state').val(),
     }
     callAPIs(query);
-    // getTravelTime(query, postDirectionResults);
-    })
-  );
-}
-
-//This function geolocates the user and
-function getCurrentLocation() {
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition( function(position) {
-    currentLocation.lat = position.coords.latitude;
-    currentLocation.lng = position.coords.longitude;
-    });
-  }
-}
-
-function errorHandling(reason){
-  alert(reason);
-  console.log(reason);
-}
-
-// function getTravelTime(searchTerm, callback){
-//   let city = searchTerm.city;
-//   let state = searchTerm.state;
-//   // let directionURL = `https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=&key=AIzaSyA6i1il1U7eP3j5nuBs5iAcvGiPKB4gVTY`;
-//   let directionURL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Washington,DC&destinations=New+York+City,NY&key=AIzaSyA6i1il1U7eP3j5nuBs5iAcvGiPKB4gVTY';
-//   let travelObject = {
-//     url: directionURL,
-//     type: 'GET',
-//     dataType: 'jsonp',
-//     cache: false,
-//     jsonpCallback: postDirectionResults,
-//     success: postDirectionResults
-//   };
-//   $.ajax(travelObject);
-// }
-
-function postDirectionResults(results){
-  console.log('postDirectionResults ran');
-  console.log(results);
+  }));
 }
 
 function postWeatherResults(results) {
@@ -76,28 +37,20 @@ function postWeatherResults(results) {
   };
 }
 
-function postFourSquareFunResults(results) {
-  $('#js-fun-results').empty().append(`<h2>What to Do</h2>`);
-  for (let i = 0; i <10; i++){
-  const fourSquare = results.response.groups[0].items[i];
-  $('#js-fun-results').append(`<div class="window fun">
-    <div class="img-blurb"><h3><a href=${fourSquare.tips[0].canonicalUrl}>${i + 1}. ${fourSquare.venue.name}</a></h3><div class="image"><span class="rating">${fourSquare.venue.rating}</span><img src="${fourSquare.venue.photos.groups[0].items[0].prefix}150x150${fourSquare.venue.photos.groups[0].items[0].suffix}"></div>
-    <div class="blurb">${fourSquare.tips[0].text}</div></div>
-    </div>`)
-  };
+function postFourSquareFunResults(result) {
+  $('#js-fun-results').append(`<div id="fun-${result.rank}" class="window">
+  <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
+  <img src="${result.imgUrl}" alt="${result.name}"></div>
+  <div class="blurb">${result.blurb}</div></div>
+  </div>`);
 }
 
-function postFourSquareFoodResults(results) {
-  $('#js-food-results').empty();
-  $('#js-food-results').append(`<h2>What to Eat</h2>`);
-  for (let i = 0; i < 10; i++){
-    const fourSquare = results.response.groups[0].items[i];
-    $('#js-food-results').append(`<div class="window food">
-      <div class="img-blurb"><h3><a href=${fourSquare.tips[0].canonicalUrl}>${i + 1}. ${fourSquare.venue.name}</a></h3><div class="image"><span class="rating">${fourSquare.venue.rating}</span>
-      <img src="${fourSquare.venue.photos.groups[0].items[0].prefix}150x150${fourSquare.venue.photos.groups[0].items[0].suffix}"></div>
-      <div class="blurb">${fourSquare.tips[0].text}</div></div>
-      </div>`)
-  };
+function postFourSquareFoodResults(result) {
+    $('#js-food-results').append(`<div id="food-${result.rank}" class="window">
+    <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
+    <img src="${result.imgUrl}" alt="${result.name}"></div>
+    <div class="blurb">${result.blurb}</div></div>
+    </div>`);
 }
 
 function mapLocations(locationDataByType, mapCenter){
@@ -110,14 +63,14 @@ function mapLocations(locationDataByType, mapCenter){
 
   function addMarkerToMap(location, iconURL) {
     marker = new google.maps.Marker ({
-      position: new google.maps.LatLng(location[1], location[2]),
+      position: new google.maps.LatLng(location.lat, location.lng),
       icon: iconURL,
       map: map
     });
     google.maps.event.addListener(marker, 'mouseover', (function(marker, location) {
       return function(){
-        infowindow.setContent(`<div class="info-window"><img src="${location[5]}" alt="${location[0]}">
-        <a href="${location[4]}">${location[3]}. ${location[0]}</a></div>`);
+        infowindow.setContent(`<div class="info-window"><img src="${location.imgUrl2}" alt="${location.name}">
+        <a href="${location.fourSquarelink}">${location.rank}. ${location.name}</a></div>`);
         infowindow.open(map, marker);
       }
     })(marker, location));
@@ -129,6 +82,41 @@ function mapLocations(locationDataByType, mapCenter){
       addMarkerToMap(location, locationIconURL);
     });
   })
+}
+
+function handleFourSquareData(data, index) {
+  return { name: data.venue.name,
+    rank: index + 1,
+    rating: data.venue.rating,
+    blurb: (data.tips ? data.tips[0].text : 'Sorry, nothing to show.'),
+    fourSquarelink: (data.tips ? data.tips[0].canonicalUrl : 'does not exist'),
+    imgUrl:  (function() {
+      if (data.venue.photos.groups.length && data.venue.photos.groups[0].items[0].hasOwnProperty('prefix')) {
+        return data.venue.photos.groups[0].items[0].prefix + '150x150' + data.venue.photos.groups[0].items[0].suffix
+      }
+      else {
+        return '//:0'
+      }
+    })(),
+    // (function() {
+    //   if (data.venue.photos.groups && data.venue.photos.groups[0].items.length) {
+    //     return data.venue.photos.groups[0].items[0].prefix + '150x150' + data.venue.photos.groups[0].items[0].suffix
+    //   }
+    //   else {
+    //     return 'does not exist'
+    //   }
+    // })(),
+    imgUrl2: (function() {
+      if (data.venue.photos.groups.length && data.venue.photos.groups[0].items[0].hasOwnProperty('prefix')) {
+        return data.venue.photos.groups[0].items[0].prefix + '50x50' + data.venue.photos.groups[0].items[0].suffix
+      }
+      else {
+        return '//:0'
+      }
+    })(),
+    lat: (data.venue.location.labeledLatLngs ? data.venue.location.labeledLatLngs[0].lat : data.venue.location.lat),
+    lng:(data.venue.location.labeledLatLngs ? data.venue.location.labeledLatLngs[0].lng : data.venue.location.lng)
+  }
 }
 
 function callAPIs(searchTerm){
@@ -171,49 +159,64 @@ function callAPIs(searchTerm){
   };
   const callFourSquareFood = $.ajax(fourSquareFoodObject);
 
-  Promise.all([callWeather, callFourSquareFun, callFourSquareFood]).then((responses) => {
+  Promise.all([callWeather, callFourSquareFun, callFourSquareFood]).catch(error => {
+    alert('Sorry, there was an error!  Please check the format and try again' );
+    $('#loading').text('Unable to Load.');
+    console.log(error);
+    throw error;
+  })
+  .then((responses) => {
     $('#loading').empty();
+    console.log(responses[1], responses[2])
     postWeatherResults(responses[0]);
-    postFourSquareFunResults(responses[1]);
-    postFourSquareFoodResults(responses[2]);
+    // postFourSquareFunResults(responses[1]);
+    // postFourSquareFoodResults(responses[2]);
+    const parsedFunResults = responses[1].response.groups[0].items.splice(0, 10).map(handleFourSquareData);
+    const parsedFoodResults = responses[2].response.groups[0].items.splice(0, 10).map(handleFourSquareData);
+    console.log(parsedFunResults, parsedFoodResults)
+    $('#js-fun-results').empty().append(`<h2>What to Do</h2>`);
+    $('#js-food-results').empty().append(`<h2>What to Eat</h2>`);
+    parsedFunResults.forEach(postFourSquareFunResults);
+    parsedFoodResults.forEach(postFourSquareFoodResults);
+
     const destinationInput = responses[1].response.geocode.center;
-    const funLocations = responses[1].response.groups[0].items.splice(0, 10).map(function(item, index) {
-      return [
-        item.venue.name,
-        Number(item.venue.location.labeledLatLngs[0].lat),
-        Number(item.venue.location.labeledLatLngs[0].lng),
-        index + 1,
-        item.tips[0].canonicalUrl,
-        item.venue.photos.groups[0].items[0].prefix + '50x50' + item.venue.photos.groups[0].items[0].suffix
-      ];
-    });
-    const foodLocations = responses[2].response.groups[0].items.splice(0, 10).map(function(item, index) {
-      return [
-        item.venue.name,
-        Number(item.venue.location.labeledLatLngs[0].lat),
-        Number(item.venue.location.labeledLatLngs[0].lng),
-        index + 1,
-        item.tips[0].canonicalUrl,
-        item.venue.photos.groups[0].items[0].prefix + '50x50'+ item.venue.photos.groups[0].items[0].suffix
-      ];
-    });
+    // const funLocations = responses[1].response.groups[0].items.splice(0, 10).map(function(item, index) {
+    //   return [
+    //     item.venue.name,
+    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lat : item.venue.location.lat),
+    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lng : item.venue.location.lng),
+    //     index + 1,
+    //     item.tips[0].canonicalUrl,
+    //     item.venue.photos.groups[0].items[0].prefix + '50x50' + item.venue.photos.groups[0].items[0].suffix
+    //   ];
+    // });
+    // const foodLocations = responses[2].response.groups[0].items.splice(0, 10).map(function(item, index) {
+    //   return [
+    //     item.venue.name,
+    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lat : item.venue.location.lat),
+    //     (item.venue.location.labeledLatLngs ? item.venue.location.labeledLatLngs[0].lng : item.venue.location.lng),
+    //     index + 1,
+    //     item.tips[0].canonicalUrl,
+    //     item.venue.photos.groups[0].items[0].prefix + '50x50'+ item.venue.photos.groups[0].items[0].suffix
+    //   ];
+    // });
     let locationDataByType = {
       fun: {
-        objects: funLocations,
+        objects: parsedFunResults,
         iconURL: 'http://maps.google.com/mapfiles/ms/micons/POI.png'
       },
       food: {
-        objects: foodLocations,
+        objects: parsedFoodResults,
         iconURL: 'http://maps.google.com/mapfiles/ms/micons/restaurant.png'
       }
     };
     mapLocations(locationDataByType, destinationInput);
-  }).catch(errorHandling(reason));
+  });
 }
+
 
 function planIt() {
   listenForClick();
-  getCurrentLocation();
   const defaultLocation = {
     city: 'Santa Barbara',
     state: 'CA'
