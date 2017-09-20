@@ -11,6 +11,7 @@ const config = {
     console.log('error');
   }
 };
+let currentLocation = {};
 
 //Initiate event listeners and listen for click
 function listenForClick() {
@@ -22,7 +23,7 @@ function listenForClick() {
       state: $('#js-destination-state').val(),
     }
     callAPIs(query);
-    getTravelTime(query, postDirectionResults);
+    DistanceMatrixService(query);
     })
   );
 }
@@ -31,32 +32,58 @@ function listenForClick() {
 function getCurrentLocation() {
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition( function(position) {
-    currentLocation.lat = position.coords.latitude;
-    currentLocation.lng = position.coords.longitude;
-    console.log(currentLocation);
+      currentLocation.lat = position.coords.latitude;
+      currentLocation.lng = position.coords.longitude;
+    }, function() {
+      console.log('Distance matrix service not available');
     });
   }
 }
 
-function getTravelTime(searchTerm, callback){
-  let city = searchTerm.city;
-  let state = searchTerm.state;
-  // let directionURL = `https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=&key=AIzaSyA6i1il1U7eP3j5nuBs5iAcvGiPKB4gVTY`;
-  let directionURL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Washington,DC&destinations=New+York+City,NY&key=AIzaSyA6i1il1U7eP3j5nuBs5iAcvGiPKB4gVTY';
-  let travelObject = {
-    url: directionURL,
-    type: 'GET',
-    dataType: 'json',
-    // cache: false,
-    // jsonpCallback: postDirectionResults,
-    success: postDirectionResults
+function DistanceMatrixService(search) {
+  let distanceObject = {
+    origins: [currentLocation],
+    destinations: [search.city, search.state],
+    travelMode: 'DRIVING',
+    unitSystem: google.maps.UnitSystem.IMPERIAL
   };
-  $.ajax(travelObject);
+  const service = new google.maps.DistanceMatrixService();
+  service.getDistanceMatrix(distanceObject, postDirectionResults);
 }
 
-function postDirectionResults(results){
-  console.log('postDirectionResults ran');
-  console.log(results);
+function postDirectionResults(response, status) {
+  let parsedArray = [];
+  if (status == 'OK') {
+      const results = response.rows[0].elements;
+    for (let i = 0; i < results.length; i++) {
+      let result = {
+        distance: results[i].distance.text,
+        duration: results[i].duration.text,
+        value: results[i].duration.value
+      };
+      parsedArray.push(result);
+    }
+    parsedArray.sort( (a,b) => {
+      return a.value - b.value;
+    })
+  }
+  $('#js-directions').empty().append(
+    `<div class="window"><h2>The Drive</h2>
+    <h5>**Approximations based on current location</h5>
+    <div class="img-trans-details">
+    <div class="transportation">
+    <img src="Assets/there-yet-edit.jpg">
+    </div>
+    <div class="transportation">
+    <div class="trans-details">
+    <span>${parsedArray[0].duration}</span>
+    </div>
+    <div class="trans-details">
+    <span>${parsedArray[0].distance}</span>
+    </div>
+    </div>
+    </div>`
+  )
 }
 
 //Receives data returned from weather API and post to DOM
@@ -159,7 +186,7 @@ function handleFourSquareData(data, index) {
 
 //Function that calls the APIs and passes in the users parameters for the GET requests
 function callAPIs(searchTerm){
-  const localURL = `http://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${searchTerm.city}.json`;
+  const localURL = `https://api.wunderground.com/api/5c23472908e94808/forecast/conditions/q/${searchTerm.state}/${searchTerm.city}.json`;
   const weatherObject = {
     url: localURL,
     dataType: 'json',
@@ -201,11 +228,9 @@ function callAPIs(searchTerm){
   Promise.all([callWeather, callFourSquareFun, callFourSquareFood])
   .then((responses) => {
     $('#loading').empty();
-    console.log(responses[1], responses[2])
     postWeatherResults(responses[0]);
     const parsedFunResults = responses[1].response.groups[0].items.splice(0, 10).map(handleFourSquareData);
     const parsedFoodResults = responses[2].response.groups[0].items.splice(0, 10).map(handleFourSquareData);
-    console.log(parsedFunResults, parsedFoodResults)
     $('#js-fun-results').empty().append(`<h2>What to Do</h2>`);
     $('#js-food-results').empty().append(`<h2>What to Eat</h2>`);
     parsedFunResults.forEach(postFourSquareFunResults);
@@ -215,11 +240,11 @@ function callAPIs(searchTerm){
     let locationDataByType = {
       fun: {
         objects: parsedFunResults,
-        iconURL: 'http://maps.google.com/mapfiles/ms/micons/POI.png'
+        iconURL: 'https://maps.google.com/mapfiles/ms/micons/POI.png'
       },
       food: {
         objects: parsedFoodResults,
-        iconURL: 'http://maps.google.com/mapfiles/ms/micons/restaurant.png'
+        iconURL: 'https://maps.google.com/mapfiles/ms/micons/restaurant.png'
       }
     };
     mapLocations(locationDataByType, destinationInput);
@@ -239,6 +264,7 @@ function planIt() {
     state: 'CA'
   };
   callAPIs(defaultLocation);
+  getCurrentLocation();
 }
 
 //On page load, call the function 'planIt'

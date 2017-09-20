@@ -65,9 +65,9 @@ h1 {
     width: 175px;
   }
 
-#four-square img, #wunderground img {
-  width: 100%;
-}
+  #four-square img, #wunderground img {
+    width: 100%;
+  }
 
 .text-input h3, input{
   display: inline-block;
@@ -121,8 +121,25 @@ button:hover {
   z-index: 3;
 }
 
-#js-weather-forecast h2 {
+#js-weather-forecast h2, #js-directions h2  {
   padding-left: 0.6em;
+}
+
+  #js-directions h2 {
+    text-align: left;
+    margin-bottom: 5px;
+  }
+
+  #js-directions h5 {
+    text-align: left;
+    margin-top: 0;
+    padding-left: 1em;
+  }
+
+#js-directions img {
+  width: 75px;
+  border: 1px black solid;
+  border-radius: 10%;
 }
 .weather-forecast {
   max-width: 33.33%;
@@ -147,7 +164,32 @@ button:hover {
   display: inline-block;
 }
 
-.img-blurb {
+.img-trans-details {
+  padding-left: 20px;
+}
+
+.transportation {
+  vertical-align: top;
+  padding-left: 20px;
+}
+
+.transportation h4 {
+  display: inline-block;
+  margin: 0;
+}
+
+  .trans-details {
+    vertical-align: top;
+    padding-left: 4px;
+  }
+
+  .trans-details span {
+    padding-left: 5px;
+    font-weight: bold;
+    font-size: 1em;
+  }
+
+.img-blurb, .transportation {
   display: inline-block;
 }
 
@@ -186,9 +228,29 @@ button:hover {
   text-align: center;
 }
 
-  .info-window img {
-    display: block;
-    margin: 0 auto;
-    border-radius: 5%;
-    width: 50px;
-  }
+.info-window img {
+  display: block;
+  margin: 0 auto;
+  border-radius: 5%;
+}
+
+#footer {
+  text-align: left;
+}
+
+#four-square {
+  width: 200px;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+#wunderground {
+  width: 165px;
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 15px;
+}
+
+#four-square img, #wunderground img {
+  width: 100%;
+}
