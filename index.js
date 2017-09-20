@@ -34,6 +34,7 @@ function getCurrentLocation() {
     navigator.geolocation.getCurrentPosition( function(position) {
     currentLocation.lat = position.coords.latitude;
     currentLocation.lng = position.coords.longitude;
+    console.log(currentLocation);
     });
   }
 }
@@ -51,9 +52,9 @@ function getTravelTime(searchTerm, callback){
   let travelObject = {
     url: directionURL,
     type: 'GET',
-    dataType: 'jsonp',
-    cache: false,
-    jsonpCallback: postDirectionResults,
+    dataType: 'json',
+    // cache: false,
+    // jsonpCallback: postDirectionResults,
     success: postDirectionResults
   };
   $.ajax(travelObject);
@@ -208,7 +209,7 @@ function callAPIs(searchTerm){
       }
     };
     mapLocations(locationDataByType, destinationInput);
-  }).catch(errorHandling(reason));
+  });
 }
 
 function planIt() {
