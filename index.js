@@ -54,7 +54,6 @@ function getDistance(search) {
 function postDirectionResults(response, status) {
   let parsedArray = [];
   if (status == 'OK' && response.rows["0"].elements["0"].status != "ZERO_RESULTS") {
-    console.log(status, response);
     const results = response.rows[0].elements;
     for (let i = 0; i < results.length; i++) {
       let result = {
@@ -85,7 +84,6 @@ function postDirectionResults(response, status) {
       </div>`
     )
   }
-
   else {
     $('#js-directions').empty().append(
     `<div class="window"><h2>The Drive</h2>
@@ -268,7 +266,6 @@ function callAPIs(searchTerm){
   .catch(error => {
     alert('Sorry, there was an error!  Please check the format and try again' );
     $('#loading').text('Unable to Load.');
-    console.log(error);
   });
 }
 
