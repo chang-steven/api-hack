@@ -23,7 +23,7 @@ function listenForClick() {
       state: $('#js-destination-state').val(),
     }
     callAPIs(query);
-    DistanceMatrixService(query);
+    getDistance(query);
     })
   );
 }
@@ -40,7 +40,7 @@ function getCurrentLocation() {
   }
 }
 
-function DistanceMatrixService(search) {
+function getDistance(search) {
   let distanceObject = {
     origins: [currentLocation],
     destinations: [search.city, search.state],
@@ -53,8 +53,9 @@ function DistanceMatrixService(search) {
 
 function postDirectionResults(response, status) {
   let parsedArray = [];
-  if (status == 'OK') {
-      const results = response.rows[0].elements;
+  if (status == 'OK' && response.rows["0"].elements["0"].status != "ZERO_RESULTS") {
+    console.log(status, response);
+    const results = response.rows[0].elements;
     for (let i = 0; i < results.length; i++) {
       let result = {
         distance: results[i].distance.text,
@@ -65,25 +66,40 @@ function postDirectionResults(response, status) {
     }
     parsedArray.sort( (a,b) => {
       return a.value - b.value;
-    })
+    });
+    $('#js-directions').empty().append(
+      `<div class="window"><h2>The Drive</h2>
+      <h5>**Approximations based on current location</h5>
+      <div class="img-trans-details">
+      <div class="transportation">
+      <img src="Assets/there-yet-edit.jpg">
+      </div>
+      <div class="transportation">
+      <div class="trans-details">
+      <span>${parsedArray[0].duration}</span>
+      </div>
+      <div class="trans-details">
+      <span>${parsedArray[0].distance}</span>
+      </div>
+      </div>
+      </div>`
+    )
   }
-  $('#js-directions').empty().append(
+
+  else {
+    $('#js-directions').empty().append(
     `<div class="window"><h2>The Drive</h2>
-    <h5>**Approximations based on current location</h5>
     <div class="img-trans-details">
     <div class="transportation">
     <img src="Assets/there-yet-edit.jpg">
     </div>
     <div class="transportation">
     <div class="trans-details">
-    <span>${parsedArray[0].duration}</span>
-    </div>
-    <div class="trans-details">
-    <span>${parsedArray[0].distance}</span>
+    <span>Unable to estimate drive details based on current location</span>
     </div>
     </div>
     </div>`
-  )
+  )}
 }
 
 //Receives data returned from weather API and post to DOM
