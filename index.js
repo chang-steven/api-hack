@@ -116,7 +116,7 @@ function postWeatherResults(results) {
 //Receives data from Four Square API call for fun results and post to DOM
 function postFourSquareFunResults(result) {
   $('#js-fun-results').append(`<div id="fun-${result.rank}" class="window">
-  <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
+  <div class="img-blurb"><h3><a href=${result.fourSquarelink} target="_blank">${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
   <img src="${result.imgUrl}" alt="${result.name}"></div>
   <div class="blurb">${result.blurb}</div></div>
   </div>`);
@@ -125,7 +125,7 @@ function postFourSquareFunResults(result) {
 //Receives data from Four Square API call for food results and post to DOM
 function postFourSquareFoodResults(result) {
   $('#js-food-results').append(`<div id="food-${result.rank}" class="window">
-  <div class="img-blurb"><h3><a href=${result.fourSquarelink}>${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
+  <div class="img-blurb"><h3><a href=${result.fourSquarelink} target="_blank">${result.rank}. ${result.name}</a></h3><div class="image"><span class="rating">${result.rating}</span>
   <img src="${result.imgUrl}" alt="${result.name}"></div>
   <div class="blurb">${result.blurb}</div></div>
   </div>`);
@@ -149,7 +149,7 @@ function mapLocations(locationDataByType, mapCenter){
     google.maps.event.addListener(marker, 'mouseover', (function(marker, location) {
       return function(){
         infowindow.setContent(`<div class="info-window"><img src="${location.imgUrl2}" alt="${location.name}">
-        <a href="${location.fourSquarelink}">${location.rank}. ${location.name}</a></div>`);
+        <a href="${location.fourSquarelink}" target="_blank">${location.rank}. ${location.name}</a></div>`);
         infowindow.open(map, marker);
       }
     })(marker, location));

@@ -49,7 +49,7 @@ h1 {
 
   #logo img {
     position: relative;
-    top: 14px;
+    top: 11px;
   }
 
 #four-square, #wunderground {
@@ -104,10 +104,27 @@ button:hover {
   color: white;
 }
 
+a {
+  text-decoration: none;
+  color: darkgreen;
+}
+
+a:hover {
+  color: #4CAF50;
+}
+
+a:visited {
+  color: mediumpurple;
+}
+
 #left-pane, #js-fun-results, #js-food-results {
   padding-left: 15px;
   vertical-align: top;
 }
+
+  #left-pane {
+    margin-top: 18px;
+  }
 
 #map {
   display: inline-block;
@@ -151,12 +168,14 @@ button:hover {
   .weather-forecast h3 {
     padding-left: 8px;
     width: 85%;
+    margin-bottom: 8px;
   }
 
   .weather-forecast img {
     text-align: center;
     display: block;
     margin: auto;
+    margin-bottom: 8px;
   }
 
 .weather-blurb {
@@ -195,6 +214,9 @@ button:hover {
   display: inline-block;
 }
 
+  .img-blurb h3 {
+    max-width: 275px;
+  }
   .image {
     display: inline-block;
     position: relative ;
@@ -223,7 +245,6 @@ button:hover {
     display: inline-block;
     width: 125px;
     font-size: 0.85em;
-    overflow-y: scroll;
   }
 
 .info-window {
