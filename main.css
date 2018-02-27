@@ -76,7 +76,7 @@ h1 {
 
 .text-input input {
   border: 1px gray solid;
-  border-radius: 10%;
+  /* border-radius: 10%; */
   font-size: 12px;
   padding: 4px;
 }
